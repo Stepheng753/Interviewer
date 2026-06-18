@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing } from '../theme/theme';
 import TranscriptItem from '../components/TranscriptItem';
 import { useInterviewManager } from '../hooks/useInterviewManager';
@@ -11,7 +12,9 @@ export default function InterviewScreen() {
     isRecording, 
     startRecording, 
     stopRecording, 
-    removePair 
+    removePair,
+    clearHistory,
+    logout
   } = useInterviewManager();
   
   const theme = colors.light; // using light theme
@@ -19,8 +22,18 @@ export default function InterviewScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Text style={[styles.title, { color: theme.primary }]}>Interview Session</Text>
-        <View style={[styles.statusIndicator, { backgroundColor: isConnected ? 'green' : 'red' }]} />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={[styles.title, { color: theme.primary }]}>Interview Session</Text>
+          <View style={[styles.statusIndicator, { backgroundColor: isConnected ? 'green' : 'red', marginLeft: 8 }]} />
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={clearHistory} style={{ marginRight: 16 }}>
+            <Text style={{ color: theme.primary, fontWeight: 'bold' }}>New Chat</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={logout}>
+            <Text style={{ color: theme.destructive, fontWeight: 'bold' }}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList

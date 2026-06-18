@@ -20,6 +20,8 @@ export function AuthProvider({ children }) {
 
   const loadStoredData = async () => {
     try {
+      // Temporarily disabled auto-login so the app starts on the login page
+      /*
       const storedToken = await SecureStore.getItemAsync('token');
       const storedUser = await SecureStore.getItemAsync('user');
       
@@ -27,6 +29,7 @@ export function AuthProvider({ children }) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
       }
+      */
     } catch (e) {
       console.log('Error loading auth data', e);
     }

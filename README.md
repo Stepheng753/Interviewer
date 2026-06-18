@@ -75,9 +75,10 @@ Tailscale provides static IPs that do not change between server restarts or netw
   ```
 
 #### 3. WSL Port Forwarding (Run Once on Windows)
-Since WSL runs behind a virtual switch, you must tell Windows to forward incoming Tailscale port 3000 requests into WSL. Run this command **once** in **Windows PowerShell (as Administrator)**:
+Since WSL runs behind a virtual switch, you must tell Windows to forward incoming Tailscale port 3000 (Backend) and port 8081 (Metro Bundler) requests to your WSL IP address. Run this command **once** in **Windows PowerShell (as Administrator)** (replace `YOUR_WSL_IP` with your actual WSL IP, e.g., from `ip addr`):
 ```powershell
-netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 connectport=3000 connectaddress=127.0.0.1
+netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 connectport=3000 connectaddress=YOUR_WSL_IP
+netsh interface portproxy add v4tov4 listenport=8081 listenaddress=0.0.0.0 connectport=8081 connectaddress=YOUR_WSL_IP
 ```
 
 #### 4. Run the Apps
@@ -86,10 +87,10 @@ netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 conne
   cd interviewer-backend
   npm run dev
   ```
-* **Frontend:** Start the Expo server using the LAN host:
+* **Frontend:** Start the Expo server using your Windows Tailscale IP to route the QR code connections properly:
   ```bash
   cd interviewer-mobile
-  npx expo start --host lan
+  REACT_NATIVE_PACKAGER_HOSTNAME="YOUR_TAILSCALE_IP" npx expo start
   ```
   Scan the QR code in Expo Go to run the app.
 
