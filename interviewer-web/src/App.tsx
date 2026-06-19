@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mic, MicOff, LogOut, Trash2, Calendar, User, Lock, Mail, 
-  MessageSquare, RefreshCw, AlertCircle, Shield
+  MessageSquare, RefreshCw, AlertCircle, Shield, Sun, Moon
 } from 'lucide-react';
 import './App.css';
 
 // Build-time environment config with fallback values
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
 
 interface UserProfile {
   id: number;
@@ -30,6 +30,27 @@ interface ChatLogEntry {
 }
 
 function App() {
+  // Theme state defaulting to system theme
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   // Navigation View
   const [currentView, setCurrentView] = useState<'login' | 'register' | 'dashboard'>('login');
   
@@ -211,25 +232,34 @@ function App() {
 
   const fetchUserProfile = async () => {
     try {
-      // Decode JWT safely to retrieve user details
       if (!token) return;
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        window.atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      const decoded = JSON.parse(jsonPayload);
       
-      setUser({
-        id: decoded.id,
-        email: decoded.email,
-        name: decoded.name || 'Developer User'
+      const res = await fetch(`${API_URL}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        // Fallback to decode if API call is not successful
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          window.atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        const decoded = JSON.parse(jsonPayload);
+        setUser({
+          id: decoded.id,
+          email: decoded.email,
+          name: decoded.name || 'Developer User'
+        });
+      }
     } catch (err) {
-      console.error('Failed to parse authentication token:', err);
+      console.error('Failed to retrieve user profile:', err);
       handleLogout();
     }
   };
@@ -354,8 +384,14 @@ function App() {
       });
       audioContextRef.current = audioContext;
 
-      // 2. Request mic access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 2. Request mic access with standard echo cancellation filters
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
       micStreamRef.current = stream;
 
       // 3. Initialize SpeechRecognition if available
@@ -491,6 +527,11 @@ function App() {
 
     processor.onaudioprocess = (e) => {
       if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+
+      // Skip recording/streaming if Gemini speaker is currently playing audio response
+      if (audioContext && audioContext.currentTime < nextPlaybackTimeRef.current) {
+        return;
+      }
 
       const inputBuffer = e.inputBuffer.getChannelData(0); // Float32Array
       const pcmBuffer = float32ToInt16(inputBuffer);
@@ -855,9 +896,19 @@ function App() {
             <p>Your session audio is processed on this machine. Data is stored locally.</p>
           </div>
 
-          <div className="status-container">
-            <span className={`status-dot ${wsStatus}`}></span>
-            <span className={`status-text ${wsStatus}`}>{wsStatus}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button 
+              className="theme-toggle-btn" 
+              onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
+            <div className="status-container">
+              <span className={`status-dot ${wsStatus}`}></span>
+              <span className={`status-text ${wsStatus}`}>{wsStatus}</span>
+            </div>
           </div>
         </header>
 

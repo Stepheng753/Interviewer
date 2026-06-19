@@ -143,7 +143,7 @@ app.post('/api/auth/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
   } catch (err) {
     console.error('Login error:', err);
@@ -152,6 +152,17 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // --- REST Endpoints ---
+
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await dbGet('SELECT id, name, email FROM users WHERE id = ?', [req.user.id]);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/api/history', authenticateToken, async (req, res) => {
   try {

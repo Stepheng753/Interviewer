@@ -79,6 +79,24 @@ describe('Interviewer Backend REST API Integration Tests', () => {
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty('error', 'Invalid credentials');
     });
+
+    it('should retrieve current user profile from GET /api/auth/me', async () => {
+      const res = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.id).toBe(testUserId);
+      expect(res.body.name).toBe(testUser.name);
+      expect(res.body.email).toBe(testUser.email);
+    });
+
+    it('should deny GET /api/auth/me access without token', async () => {
+      const res = await request(app)
+        .get('/api/auth/me');
+
+      expect(res.status).toBe(401);
+    });
   });
 
   describe('Protected Q&A History Endpoints', () => {
