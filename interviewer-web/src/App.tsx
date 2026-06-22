@@ -6,6 +6,7 @@ import {
 import './App.css';
 import InkReveal from './components/ui/ink-reveal';
 import { VoiceChat } from './components/ui/ia-siri-chat';
+import { AVAILABLE_THEMES, parseColorToRgb, getContrastMaskColor } from './themes/registry';
 
 // Build-time environment config with fallback values
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -262,7 +263,7 @@ function UserSettings({ user, token, apiURL, onUpdateProfile, onClearHistory, ha
 }
 
 function App() {
-  // Theme state defaulting to system theme
+  // Theme mode state (light/dark) defaulting to system theme
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
@@ -272,6 +273,34 @@ function App() {
     return 'light';
   });
 
+  // Active theme state (maps to the custom CSS theme stylesheet)
+  const [activeTheme, setActiveTheme] = useState<string>(() => {
+    const val = localStorage.getItem('activeTheme');
+    if (val === 'default') return 'starry-night'; // Migrate legacy default value to starry-night
+    return val || 'starry-night';
+  });
+
+  // Computed high-contrast mask color for InkReveal
+  const [computedMaskColor, setComputedMaskColor] = useState<[number, number, number]>(
+    theme === 'dark' ? [24, 26, 36] : [245, 247, 250]
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const bgVal = window.getComputedStyle(document.documentElement).getPropertyValue('--background');
+      if (bgVal) {
+        const rgb = parseColorToRgb(bgVal);
+        if (rgb) {
+          setComputedMaskColor(getContrastMaskColor(rgb));
+          return;
+        }
+      }
+      setComputedMaskColor(theme === 'dark' ? [24, 26, 36] : [245, 247, 250]);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [activeTheme, theme]);
+
+  // Apply light/dark mode changes
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -282,6 +311,25 @@ function App() {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Apply custom theme stylesheet link loading
+  useEffect(() => {
+    let link = document.getElementById('dynamic-theme-stylesheet') as HTMLLinkElement;
+    if (activeTheme === 'classic') {
+      if (link) {
+        link.remove();
+      }
+    } else {
+      if (!link) {
+        link = document.createElement('link');
+        link.id = 'dynamic-theme-stylesheet';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+      }
+      link.href = `/themes/${activeTheme}.css`;
+    }
+    localStorage.setItem('activeTheme', activeTheme);
+  }, [activeTheme]);
 
   // Navigation View
   const [currentView, setCurrentView] = useState<'login' | 'register' | 'dashboard'>('login');
@@ -978,10 +1026,9 @@ function App() {
   // --- Render Functions ---
 
   if (currentView === 'login' || currentView === 'register') {
-    const maskColor: [number, number, number] = theme === 'dark' ? [24, 26, 36] : [245, 247, 250];
     return (
       <div className="auth-container">
-        <InkReveal maskColor={maskColor} />
+        <InkReveal maskColor={computedMaskColor} />
         <div className="auth-card">
           <div className="auth-header">
             <div className="logo-container" style={{ justifyContent: 'center', marginBottom: '15px' }}>
@@ -1119,11 +1166,9 @@ function App() {
     );
   }
 
-  const maskColor: [number, number, number] = theme === 'dark' ? [24, 26, 36] : [245, 247, 250];
-
   return (
     <div className="app-viewport">
-      <InkReveal maskColor={maskColor} />
+      <InkReveal maskColor={computedMaskColor} />
       <div className="app-card">
         {/* Top Header Bar */}
         <header className="app-header">
@@ -1263,23 +1308,46 @@ function App() {
 
               {dashboardView === 'themes' && (
                 <div className="themes-view-container" key="themes">
-                  <div className="themes-grid">
-                    <div 
-                      className={`theme-card light-card ${theme === 'light' ? 'active' : ''}`}
-                      onClick={() => setTheme('light')}
-                    >
-                      <div className="theme-color-preview" style={{ backgroundColor: '#3a5ba0' }}></div>
-                      <div className="theme-name">Light Theme</div>
-                      <div className="theme-desc">Primary Palette</div>
+                  <div className="themes-content-wrapper">
+                    <div className="themes-header-section">
+                      <span className="themes-section-title">Appearance Mode</span>
+                      <div className="mode-toggle-group">
+                        <button 
+                          className={`mode-btn ${theme === 'light' ? 'active' : ''}`}
+                          onClick={() => setTheme('light')}
+                        >
+                          Light
+                        </button>
+                        <button 
+                          className={`mode-btn ${theme === 'dark' ? 'active' : ''}`}
+                          onClick={() => setTheme('dark')}
+                        >
+                          Dark
+                        </button>
+                      </div>
                     </div>
                     
-                    <div 
-                      className={`theme-card dark-card ${theme === 'dark' ? 'active' : ''}`}
-                      onClick={() => setTheme('dark')}
-                    >
-                      <div className="theme-color-preview" style={{ backgroundColor: '#ffe066' }}></div>
-                      <div className="theme-name">Dark Theme</div>
-                      <div className="theme-desc">High-Contrast Palette</div>
+                    <div className="themes-divider"></div>
+                    
+                    <div className="themes-header-section">
+                      <span className="themes-section-title">Color Palette</span>
+                      <span className="themes-section-subtitle">Choose from 40 custom design theme profiles.</span>
+                    </div>
+
+                    <div className="themes-grid">
+                      {AVAILABLE_THEMES.map((t) => (
+                        <div 
+                          key={t.id}
+                          className={`theme-card ${activeTheme === t.id ? 'active' : ''}`}
+                          onClick={() => setActiveTheme(t.id)}
+                        >
+                          <div className="theme-color-preview" style={{ backgroundColor: t.previewColor }}></div>
+                          <div className="theme-meta-info">
+                            <div className="theme-name">{t.name}</div>
+                            <div className="theme-desc">{t.description}</div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
