@@ -115,8 +115,8 @@ export const AVAILABLE_THEMES: ThemeRegistryItem[] = [
   },
   {
     id: "bw",
-    name: "Bw",
-    description: "Bw color scheme",
+    name: "BW",
+    description: "BW color scheme",
     previewColor: "#171717"
   },
   {

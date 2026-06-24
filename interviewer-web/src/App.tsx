@@ -160,6 +160,7 @@ function App() {
   // Dashboard Sub-Views State
   const [dashboardView, setDashboardView] = useState<'chat' | 'history' | 'themes' | 'settings'>('chat');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const toggleMenu = () => {
     if (!isMenuOpen) {
@@ -305,7 +306,8 @@ function App() {
             },
             body: JSON.stringify({
               question: interviewerMsg.text,
-              answer: userMsg.text
+              answer: userMsg.text,
+              category: selectedCategory
             })
           });
           if (res.ok) {
@@ -403,6 +405,7 @@ function App() {
     setToken(null);
     setUser(null);
     setDialogue([]);
+    setSelectedCategory(null);
   };
 
   const deletePair = async (id: number) => {
@@ -435,13 +438,24 @@ function App() {
     }
   };
 
+  const resetConversation = () => {
+    stopVoiceSession();
+    updateDialogueState([]);
+    currentUserBubbleIdRef.current = null;
+    currentInterviewerBubbleIdRef.current = null;
+    savedPairsRef.current.clear();
+    setSelectedCategory(null);
+  };
+
   // --- Voice Streaming Logic (Web Audio API & WebSocket) ---
 
-  const startVoiceSession = async () => {
+  const startVoiceSession = async (category: string) => {
     if (!token) return;
     setWsStatus('connecting');
     setIsVoiceActive(true);
-    savedPairsRef.current.clear();
+    if (dialogueRef.current.length === 0) {
+      savedPairsRef.current.clear();
+    }
     isWaitingForModelResponseRef.current = true;
 
     try {
@@ -496,7 +510,19 @@ function App() {
       }
 
       // 4. Connect WebSocket to the BFF Server Proxy
-      const ws = new WebSocket(`${WS_URL}?token=${token}`);
+      const isResumeSession = dialogueRef.current.length > 0;
+      let lastQuestionText = '';
+      if (isResumeSession) {
+        for (let i = dialogueRef.current.length - 1; i >= 0; i--) {
+          if (dialogueRef.current[i].role === 'interviewer') {
+            lastQuestionText = dialogueRef.current[i].text;
+            break;
+          }
+        }
+      }
+
+      const wsUrl = `${WS_URL}?token=${token}&category=${category}&isResume=${isResumeSession}&lastQuestion=${encodeURIComponent(lastQuestionText)}`;
+      const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -710,7 +736,8 @@ function App() {
             },
             body: JSON.stringify({
               question: current.text,
-              answer: next.text
+              answer: next.text,
+              category: selectedCategory
             })
           });
         } catch (err) {
@@ -881,6 +908,9 @@ function App() {
                   stopVoiceSession={stopVoiceSession}
                   dialogueEndRef={dialogueEndRef}
                   renderMessageText={renderMessageText}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  resetConversation={resetConversation}
                 />
               )}
 

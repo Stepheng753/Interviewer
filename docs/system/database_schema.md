@@ -41,6 +41,7 @@ Stores individual question-and-answer interaction blocks capturing user knowledg
 | `user_id` | `INTEGER` | `REFERENCES users(id) ON DELETE CASCADE` | Associated user. |
 | `question` | `TEXT` | `NOT NULL` | The question asked by the AI. |
 | `answer` | `TEXT` | `NOT NULL` | The answer spoken by the user. |
+| `category` | `TEXT` | | Category track of the interview (`career`, `life_advice`, `family`, `health`). |
 | `timestamp` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Save timestamp. |
 
 #### DDL Statement:
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS qa_pairs (
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
+  category TEXT,
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -60,6 +62,7 @@ CREATE TABLE IF NOT EXISTS qa_pairs (
 
 - **On Delete Cascade**: Removing a user from the `users` table automatically deletes all associated QA pairs in `qa_pairs`, ensuring privacy and strict user isolation.
 - **SQLite Configuration**: Foreign keys must be enabled on every SQLite database connection by executing:
+- **Automatic Migration**: The backend dynamically checks the schema on boot and applies a schema patch via `ALTER TABLE` to add the `category` column to existing database files if it is missing.
   ```sql
   PRAGMA foreign_keys = ON;
   ```

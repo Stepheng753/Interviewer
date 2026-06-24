@@ -9,7 +9,13 @@ The Backend-For-Frontend (BFF) WebSocket proxy acts as a secure, latency-optimiz
 To initiate a live interview session, the client establishes a WebSocket connection to the backend.
 
 ### Request URL
-`ws://localhost:3000?token=<JWT_TOKEN>`
+`ws://localhost:3000?token=<JWT_TOKEN>&category=<CATEGORY>&isResume=<IS_RESUME>&lastQuestion=<LAST_QUESTION>`
+
+### Query Parameters
+- `token`: Required. User's JSON Web Token for authentication.
+- `category`: Optional. Conversation track identifier (`career`, `life_advice`, `family`, `health`). Defaults to `career`.
+- `isResume`: Optional. Boolean flag (`true`/`false`) indicating if this connection is resuming a paused session.
+- `lastQuestion`: Optional. URL-encoded string representing the last interviewer question to reiterate if resuming.
 
 ### Authentication
 The backend extracts the `token` search parameter and verifies it against the `JWT_SECRET`. If verification fails, the connection is aborted with status code `1008` (Policy Violation).
@@ -22,17 +28,24 @@ Once authorized, the backend establishes an upstream connection to Google's Gene
 `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=GEMINI_API_KEY`
 
 ### Setup Configuration Frame
-Upon connection, the backend pushes the configuration frame to Gemini:
+Upon connection, the backend loads settings dynamically from [model_config.yaml](file:///home/stepheng753/Development/Interviewer/interviewer-backend/model_config.yaml) and pushes the configuration frame to Gemini:
 ```json
 {
   "setup": {
     "model": "models/gemini-3.1-flash-live-preview",
     "generationConfig": {
-      "responseModalities": ["AUDIO"]
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "Iapetus"
+          }
+        }
+      }
     },
     "outputAudioTranscription": {},
     "systemInstruction": {
-      "parts": [{ "text": "You are a warm, conversational AI interviewer. Your goal is to interview the user about their life stories, career, and personal philosophy to help them preserve their knowledge. Ask one interesting and open-ended question at a time. Keep your questions relatively short, and wait for their response. Start by welcoming the user and asking the first question." }]
+      "parts": [{ "text": "... <Dynamic Instructions based on category & history / resume status> ..." }]
     }
   }
 }

@@ -8,11 +8,11 @@ This guide instructs AI agents on how to execute automated browser E2E tests for
 
 When tasked with verifying E2E system flows:
 
-1. **Locate Test Specs**: Scan the directory `documentation/testing/agent/` for test files (e.g. `test1.md`, `test2.md`).
+1. **Locate Test Specs**: Scan the directory `docs/testing/agent/` for test files.
 2. **Launch Dev Servers**:
    - Ensure the backend server is listening on port `3001`.
    - Ensure the Vite dev server is running on port `5173`.
-3. **Execute via Subagent**: Call the `browser_subagent` tool. In the `Task` description, copy and paste the E2E verification steps described in `documentation/testing/agent/test1.md` or `test2.md`.
+3. **Execute via Subagent**: Call the `browser_subagent` tool. In the `Task` description, copy and paste the E2E verification steps described in `docs/testing/agent/` (e.g. `onboarding-auth-e2e.md` or `voice-handshake-e2e.md`).
 4. **Analyze Results**: Read the DOM content and examine the subagent report.
 5. **Report Status**: Return a detailed success or error log summarizing the state of the interface elements and network handshakes.
 
@@ -28,5 +28,6 @@ Use these selectors and labels when instructing the browser subagent:
 | **Password Input** | `placeholder="••••••••"` | Type test password |
 | **Display Name Input** | `placeholder="John Doe"` | Type display name |
 | **Submit Button** | button text `Log In` / `Register Account` | Click to submit |
-| **Mic Toggle Button** | Class `.mic-toggle-btn` / title `Unmute Session` | Click to trigger socket handshake |
-| **Status Dot** | Class `.status-dot` (gains class `connected`) | Confirms live connection |
+| **Category Card** | Class `.category-card` (e.g., `.career`, `.life_advice`, `.family`, `.health`) | Click category track |
+| **Mic Toggle Button** | Class `.mic-toggle-btn` / status indicator | Click to trigger socket handshake |
+| **End Button** | Class `.end-convo-btn` | Click to end session and return to category grid |
