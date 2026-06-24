@@ -11,16 +11,16 @@ cleanup() {
 # Trap Ctrl+C (SIGINT) and SIGTERM signals
 trap cleanup SIGINT SIGTERM
 
-echo "🚀 Starting Interview.ai Development Servers..."
+echo "🚀 Starting AIU Development Servers..."
 
 # Start backend server
 echo "🔌 Starting backend server on port 3001..."
-(cd interviewer-backend && npm run dev) &
+(cd aiu-backend && npm run dev) &
 BACKEND_PID=$!
 
 # Start frontend Vite server
 echo "💻 Starting frontend Vite server on port 5173..."
-(cd interviewer-web && npm run dev) &
+(cd aiu-web && npm run dev) &
 FRONTEND_PID=$!
 
 echo "--------------------------------------------------------"

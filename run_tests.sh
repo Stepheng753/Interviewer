@@ -6,17 +6,17 @@ set -e
 # Harmless visual spacer
 echo ""
 echo "========================================================"
-echo "🧪 Running Interviewer Backend Integration Tests..."
+echo "🧪 Running AIU Backend Integration Tests..."
 echo "========================================================"
-cd interviewer-backend
+cd aiu-backend
 npm run test
 cd ..
 
 echo ""
 echo "========================================================"
-echo "🧪 Running Interviewer Frontend Unit Tests..."
+echo "🧪 Running AIU Frontend Unit Tests..."
 echo "========================================================"
-cd interviewer-web
+cd aiu-web
 npm run test
 cd ..
 

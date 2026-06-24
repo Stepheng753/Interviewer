@@ -46,7 +46,7 @@ describe('App Component Unit Tests', () => {
   it('should render the login card by default', () => {
     render(<App />);
     
-    const logoHeaders = screen.getAllByText(/Interview/i);
+    const logoHeaders = screen.getAllByText(/AIU/i);
     expect(logoHeaders.length).toBeGreaterThan(0);
     expect(screen.getByPlaceholderText('you@domain.com')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('App Component Unit Tests', () => {
     render(<App />);
 
     // Renders header title
-    const headerTitle = await screen.findByText('Interviewer AI');
+    const headerTitle = await screen.findByText('AIU');
     expect(headerTitle).toBeInTheDocument();
 
     // Renders the category selection grid on start
@@ -139,7 +139,7 @@ describe('App Component Unit Tests', () => {
     render(<App />);
 
     // Wait for dashboard to load
-    await screen.findByText('Interviewer AI');
+    await screen.findByText('AIU');
 
     // Find hamburger menu button and click
     const menuBtn = screen.getByTitle('Open menu');

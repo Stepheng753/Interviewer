@@ -6,7 +6,7 @@ This guide outlines techniques for logging, intercepting, and debugging WebSocke
 
 ## 1. Frame Logging in BFF Backend
 
-To trace messaging errors, set up conditional logging inside [index.js](file:///home/stepheng753/Development/Interviewer/interviewer-backend/index.js).
+To trace messaging errors, set up conditional logging inside [index.js](file:///home/stepheng753/Development/AIU/aiu-backend/index.js).
 
 ### Setup Environment Level Logs
 By using a debugging flag in the environment (`DEBUG_WS=true`), we can log the types of frames moving upstream and downstream without bloating console output with raw audio payload buffers.

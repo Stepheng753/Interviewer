@@ -8,8 +8,8 @@ To protect API credentials and authentication tokens, all configurations must re
 
 | Secret Identifier | Location | Purpose | Required For |
 | :--- | :--- | :--- | :--- |
-| **`GEMINI_API_KEY`** | `/interviewer-backend/.env` | Auths the WebSocket proxy with Google's Gemini Live API. | Voice conversation features and audio transcription. |
-| **`JWT_SECRET`** | `/interviewer-backend/.env` | Cryptographic secret for signing and verifying client JWT tokens. | Backend API auth and socket handshake authentication. |
+| **`GEMINI_API_KEY`** | `/aiu-backend/.env` | Auths the WebSocket proxy with Google's Gemini Live API. | Voice conversation features and audio transcription. |
+| **`JWT_SECRET`** | `/aiu-backend/.env` | Cryptographic secret for signing and verifying client JWT tokens. | Backend API auth and socket handshake authentication. |
 
 ---
 
@@ -22,7 +22,7 @@ Every environment directory in the repository must maintain a matching pair of e
 ### Developer Guidelines:
 - If a new environment variable is added to a `.env` file during development, the developer **MUST** immediately append it to the corresponding `.env.template` file with empty or mock values.
 - Verify that both `.env` configurations are added to the root/package `.gitignore` files.
-- Example structure of `interviewer-backend/.env.template`:
+- Example structure of `aiu-backend/.env.template`:
   ```env
   PORT=3000
   JWT_SECRET=

@@ -50,7 +50,7 @@ sessionPrompts:
   newUser:
     systemInstruction: |
       Your instructions:
-      1. Greet the user warmly. Welcome them to Interview.ai and introduce the application. Explain that Interview.ai is a platform designed to conduct high-fidelity voice interviews to preserve their stories, wisdom, and life experiences, which will ultimately be used to fine-tune a personalized AI replica that authentically imitates them.
+      1. Greet the user warmly. Welcome them to AIU and introduce the application. Explain that AIU is a platform designed to conduct high-fidelity voice interviews to preserve their stories, wisdom, and life experiences, which will ultimately be used to fine-tune a personalized AI replica that authentically imitates them.
       2. Tell them you would love to get to know them and ask for their name.
-    triggerMessage: "Please start the interview now. Welcome me, introduce Interview.ai, and ask for my name."
+    triggerMessage: "Please start the interview now. Welcome me, introduce AIU, and ask for my name."
 

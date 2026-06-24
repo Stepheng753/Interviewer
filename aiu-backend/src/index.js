@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 
 // Database Configuration
-const dbPath = process.env.DATABASE_PATH || './interviewer.db';
+const dbPath = process.env.DATABASE_PATH || './aiu.db';
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Database connection error:', err);
@@ -519,8 +519,8 @@ wss.on('connection', (ws, req) => {
         }
       };
     } else {
-      const defaultSysInst = "Your instructions:\n1. Greet the user warmly. Welcome them to Interview.ai and introduce the application. Explain that Interview.ai is a platform designed to conduct high-fidelity voice interviews to preserve their stories, wisdom, and life experiences, which will ultimately be used to fine-tune a personalized AI replica that authentically imitates them.\n2. Tell them you would love to get to know them and ask for their name.";
-      const defaultTrigger = "Please start the interview now. Welcome me, introduce Interview.ai, and ask for my name.";
+      const defaultSysInst = "Your instructions:\n1. Greet the user warmly. Welcome them to AIU and introduce the application. Explain that AIU is a platform designed to conduct high-fidelity voice interviews to preserve their stories, wisdom, and life experiences, which will ultimately be used to fine-tune a personalized AI replica that authentically imitates them.\n2. Tell them you would love to get to know them and ask for their name.";
+      const defaultTrigger = "Please start the interview now. Welcome me, introduce AIU, and ask for my name.";
 
       const sysInst = getPrompt('newUser', 'systemInstruction', defaultSysInst);
       const triggerText = getPrompt('newUser', 'triggerMessage', defaultTrigger);

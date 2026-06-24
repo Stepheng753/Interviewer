@@ -5,7 +5,7 @@ This test validates logging in with an existing user, loading saved QA history, 
 ---
 
 ## Prerequisites
-This test assumes that the database already contains a user profile (e.g. `alice@test.com` with password `password123` created in **[Manual Test: Fresh User Onboarding](file:///home/stepheng753/Development/Interviewer/docs/testing/manual/fresh-user-onboarding.md)**).
+This test assumes that the database already contains a user profile (e.g. `alice@test.com` with password `password123` created in **[Manual Test: Fresh User Onboarding](file:///home/stepheng753/Development/AIU/docs/testing/manual/fresh-user-onboarding.md)**).
 
 ---
 

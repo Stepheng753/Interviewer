@@ -6,7 +6,7 @@ process.env.JWT_SECRET = 'test_secret_key';
 const request = require('supertest');
 const { app, server, db } = require('../src/index');
 
-describe('Interviewer Backend REST API Integration Tests', () => {
+describe('AIU Backend REST API Integration Tests', () => {
   let userToken = '';
   let testUserId = null;
   let testPairId = null;

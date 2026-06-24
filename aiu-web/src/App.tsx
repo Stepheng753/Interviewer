@@ -853,7 +853,7 @@ function App() {
             onClick={() => { setDashboardView('chat'); setIsMenuOpen(false); }}
           >
             <img src="/logo.svg" className="app-logo" alt="Logo" />
-            <span>Interviewer AI</span>
+            <span>AIU</span>
           </h1>
 
           <button className="logout-action-btn" onClick={handleLogout} title="Log Out">

@@ -1,6 +1,6 @@
 # Deployment Guide: AIU.stepheng753.com
 
-This guide provides step-by-step instructions to configure DNS, acquire SSL certificates, configure Nginx, bootstrap Node/PM2, and set up automated deployments for the Interviewer project under the domain **AIU.stepheng753.com** on `flash-server`.
+This guide provides step-by-step instructions to configure DNS, acquire SSL certificates, configure Nginx, bootstrap Node/PM2, and set up automated deployments for the AIU project under the domain **AIU.stepheng753.com** on `flash-server`.
 
 ---
 
@@ -33,8 +33,10 @@ Because the subdomain points via DDNS, you must generate the Let's Encrypt SSL c
 3. Add the TXT record in Hostinger.
 4. Before pressing **Enter** in the Certbot terminal, verify the TXT record has propagated globally (you can run `nslookup -type=TXT _acme-challenge.AIU.stepheng753.com` or check via [whatsmydns.net](https://www.whatsmydns.net/#TXT/_acme-challenge.AIU.stepheng753.com)).
 5. Press **Enter** in the terminal to complete validation. Certbot will save your PEM keys to:
-   - Certificate: `/etc/letsencrypt/live/AIU.stepheng753.com/fullchain.pem`
-   - Private Key: `/etc/letsencrypt/live/AIU.stepheng753.com/privkey.pem`
+   - Certificate: `/etc/letsencrypt/live/aiu.stepheng753.com/fullchain.pem`
+   - Private Key: `/etc/letsencrypt/live/aiu.stepheng753.com/privkey.pem`
+
+> **Note**: Certbot saves certificates using lowercase domain names. The Nginx config below uses the lowercase paths to match.
 
 ---
 
@@ -63,9 +65,9 @@ Because the subdomain points via DDNS, you must generate the Let's Encrypt SSL c
        listen [::]:443 ssl;
        server_name AIU.stepheng753.com;
 
-       # SSL Certificates
-       ssl_certificate /etc/letsencrypt/live/AIU.stepheng753.com/fullchain.pem;
-       ssl_certificate_key /etc/letsencrypt/live/AIU.stepheng753.com/privkey.pem;
+       # SSL Certificates (lowercase path — matches certbot output)
+       ssl_certificate /etc/letsencrypt/live/aiu.stepheng753.com/fullchain.pem;
+       ssl_certificate_key /etc/letsencrypt/live/aiu.stepheng753.com/privkey.pem;
 
        # SSL Settings
        ssl_session_cache shared:SSL:10m;
@@ -82,7 +84,7 @@ Because the subdomain points via DDNS, you must generate the Let's Encrypt SSL c
 
        # --- 1. FRONTEND: Serve Built Static Files ---
        location / {
-           root /home/flash-server/Development/Interviewer/interviewer-web/dist;
+           root /home/flash-server/Development/AIU/aiu-web/dist;
            index index.html;
            try_files $uri $uri/ /index.html;
 
@@ -131,11 +133,11 @@ Because the subdomain points via DDNS, you must generate the Let's Encrypt SSL c
 
 Start the Express backend daemon so it listens continuously in the background on port `3000`:
 ```bash
-cd /home/flash-server/Development/Interviewer/interviewer-backend
+cd /home/flash-server/Development/AIU/aiu-backend
 npm install
 
 # Start process using PM2
-PORT=3000 GEMINI_API_KEY="your-gemini-api-key" pm2 start src/index.js --name "interviewer-backend"
+PORT=3000 GEMINI_API_KEY="your-gemini-api-key" pm2 start src/index.js --name "aiu-backend"
 
 # Persist daemon startup state
 pm2 save
@@ -147,7 +149,7 @@ pm2 save
 
 Configure client environment variables and compile production assets:
 ```bash
-cd /home/flash-server/Development/Interviewer/interviewer-web
+cd /home/flash-server/Development/AIU/aiu-web
 npm install
 
 # Create environment override variables
@@ -198,21 +200,21 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            echo "🚀 Deploying Interviewer Project..."
+            echo "🚀 Deploying AIU Project..."
 
-            cd ~/Development/Interviewer
+            cd ~/Development/AIU
             git pull origin main
 
             # 1. Update Backend
             echo "--- Processing Backend ---"
-            cd interviewer-backend
+            cd aiu-backend
             npm install
-            pm2 restart interviewer-backend || PORT=3000 GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" pm2 start src/index.js --name "interviewer-backend"
+            pm2 restart aiu-backend || PORT=3000 GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" pm2 start src/index.js --name "aiu-backend"
             pm2 save
 
             # 2. Compile Frontend
             echo "--- Processing Frontend ---"
-            cd ../interviewer-web
+            cd ../aiu-web
             npm install
             echo "VITE_API_URL=https://AIU.stepheng753.com/api" > .env.production
             echo "VITE_WS_URL=wss://AIU.stepheng753.com/ws" >> .env.production

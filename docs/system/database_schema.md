@@ -1,6 +1,6 @@
 # SQLite Database Schema
 
-For local development, Interview.ai utilizes an **SQLite** database file (`interviewer.db`) managed by the Node.js backend.
+For local development, AIU utilizes an **SQLite** database file (`aiu.db`) managed by the Node.js backend.
 
 ---
 

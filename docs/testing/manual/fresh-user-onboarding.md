@@ -6,7 +6,7 @@ This test validates registering a new user, logging in, selecting an interview t
 
 ## Prerequisites
 Ensure both the backend server and frontend Vite server are running. 
-See the **[Setup Guide](file:///home/stepheng753/Development/Interviewer/docs/system/setup.md)** for details.
+See the **[Setup Guide](file:///home/stepheng753/Development/AIU/docs/system/setup.md)** for details.
 
 ---
 
@@ -48,6 +48,6 @@ See the **[Setup Guide](file:///home/stepheng753/Development/Interviewer/docs/sy
 2. Confirm that the question-and-answer exchanges from the completed session are successfully listed in the sidebar history log.
 3. (Optional) Run the sqlite3 console tool to inspect the records:
    ```bash
-   sqlite3 interviewer-backend/interviewer.db "SELECT * FROM qa_pairs;"
+   sqlite3 aiu-backend/aiu.db "SELECT * FROM qa_pairs;"
    ```
    Verify that the questions and responses match Alice's session.

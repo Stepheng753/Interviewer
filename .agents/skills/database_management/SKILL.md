@@ -1,29 +1,29 @@
 # Agent Skill: SQLite Database Management
 
-This guide covers commands, configurations, and scripts for managing, querying, and preparing to migrate the SQLite database used by **Interview.ai** in development.
+This guide covers commands, configurations, and scripts for managing, querying, and preparing to migrate the SQLite database used by **AIU** in development.
 
 ---
 
 ## 1. Quick Console Operations
 
-Since SQLite uses a simple, local file (`interviewer.db`), database administration is straightforward and does not require complex database client installations.
+Since SQLite uses a simple, local file (`aiu.db`), database administration is straightforward and does not require complex database client installations.
 
 ### Querying Data via SQLite CLI
 If you have `sqlite3` installed, query tables directly from the command line:
 
 - **List All Registered Users**:
   ```bash
-  sqlite3 interviewer-backend/interviewer.db "SELECT id, name, email, created_at FROM users;"
+  sqlite3 aiu-backend/aiu.db "SELECT id, name, email, created_at FROM users;"
   ```
 
 - **List Saved Dialogue Pairs for a User (e.g. User ID 1)**:
   ```bash
-  sqlite3 interviewer-backend/interviewer.db "SELECT id, question, answer, timestamp FROM qa_pairs WHERE user_id = 1;"
+  sqlite3 aiu-backend/aiu.db "SELECT id, question, answer, timestamp FROM qa_pairs WHERE user_id = 1;"
   ```
 
-- **Truncate Saved Interview History for All Users**:
+- **Truncate Saved History for All Users**:
   ```bash
-  sqlite3 interviewer-backend/interviewer.db "DELETE FROM qa_pairs;"
+  sqlite3 aiu-backend/aiu.db "DELETE FROM qa_pairs;"
   ```
 
 ---
@@ -34,7 +34,7 @@ By default, SQLite does not enforce foreign key constraints (such as `ON DELETE 
 
 ```javascript
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./interviewer.db', (err) => {
+const db = new sqlite3.Database('./aiu.db', (err) => {
   if (err) return console.error('Database connection error:', err);
   
   // Enable foreign keys
@@ -62,7 +62,7 @@ When moving from local development to production, you will migrate the SQLite da
 1. **Dump SQLite Data**:
    Extract SQLite database insert scripts (filtered for compatible syntax):
    ```bash
-   sqlite3 interviewer-backend/interviewer.db .dump > sqlite_dump.sql
+   sqlite3 aiu-backend/aiu.db .dump > sqlite_dump.sql
    ```
 2. **Spin Up Postgres**: Install `pg` client dependency and set `DATABASE_URL` in the environment.
 3. **Run Schema Definitions**: Execute the DDL schemas using the PostgreSQL client wrapper.

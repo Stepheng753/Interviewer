@@ -74,7 +74,7 @@ export default function AuthView({
         <div className="auth-header">
           <div className="logo-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '15px' }}>
             <img src="/logo.svg" className="logo-icon animate-pulse" style={{ height: '48px', width: 'auto' }} alt="Logo" />
-            <h1 style={{ margin: 0 }}>Interview.ai</h1>
+            <h1 style={{ margin: 0 }}>AIU</h1>
           </div>
           <p>{currentView === 'login' ? 'Preserve your Legacy & Knowledge' : 'Create your Secure Personal Vault'}</p>
         </div>

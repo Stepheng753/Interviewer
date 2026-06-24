@@ -1,6 +1,6 @@
 # Setup Guide
 
-This guide provides instructions to set up the development environment for **Interview.ai** using a React + TypeScript web app and a Node.js + SQLite backend.
+This guide provides instructions to set up the development environment for **AIU** using a React + TypeScript web app and a Node.js + SQLite backend.
 
 ---
 
@@ -17,7 +17,7 @@ This guide provides instructions to set up the development environment for **Int
 Both frontend and backend packages require local environment configurations. Templates are provided as `.env.template` files in their respective folders.
 
 ### Backend Configurations
-Create a file at `/interviewer-backend/.env` matching the template:
+Create a file at `/aiu-backend/.env` matching the template:
 ```env
 PORT=3000
 JWT_SECRET=your_jwt_secret_token
@@ -25,7 +25,7 @@ GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ### Frontend Configurations
-Create a file at `/interviewer-web/.env` matching the template:
+Create a file at `/aiu-web/.env` matching the template:
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_WS_URL=ws://localhost:3000
@@ -37,7 +37,7 @@ VITE_WS_URL=ws://localhost:3000
 
 1. Navigate to the backend directory:
    ```bash
-   cd interviewer-backend
+   cd aiu-backend
    ```
 2. Install npm dependencies:
    ```bash
@@ -47,7 +47,7 @@ VITE_WS_URL=ws://localhost:3000
    ```bash
    npm run dev
    ```
-   *Note: On first boot, the server will automatically initialize an SQLite database file named `interviewer.db` in the backend root directory.*
+   *Note: On first boot, the server will automatically initialize an SQLite database file named `aiu.db` in the backend root directory.*
 
 ---
 
@@ -55,7 +55,7 @@ VITE_WS_URL=ws://localhost:3000
 
 1. Navigate to the frontend directory:
    ```bash
-   cd interviewer-web
+   cd aiu-web
    ```
 2. Install npm dependencies:
    ```bash
@@ -82,13 +82,13 @@ Press `Ctrl+C` inside the terminal to terminate both servers cleanly.
 ## 4. Run Tests
 
 ### Backend Tests (Jest)
-From `interviewer-backend/`:
+From `aiu-backend/`:
 ```bash
 npm run test
 ```
 
 ### Frontend Tests (Vitest)
-From `interviewer-web/`:
+From `aiu-web/`:
 ```bash
 npm run test
 ```
