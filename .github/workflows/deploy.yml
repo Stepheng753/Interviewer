@@ -1,0 +1,57 @@
+name: Deploy to Flash-Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:github-deployer
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: flash-server
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Source profile to ensure NVM node and PM2 are in the PATH
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            echo "🚀 Deploying AIU Project..."
+
+            cd ~/Development/AIU
+            git pull origin main
+
+            # 1. Update Backend
+            echo "--- Processing Backend ---"
+            cd aiu-backend
+            npm install
+            pm2 restart aiu-backend || PORT=3000 GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" pm2 start src/index.js --name "aiu-backend"
+            pm2 save
+
+            # 2. Compile Frontend
+            echo "--- Processing Frontend ---"
+            cd ../aiu-web
+            npm install
+            echo "VITE_API_URL=https://AIU.stepheng753.com/api" > .env.production
+            echo "VITE_WS_URL=wss://AIU.stepheng753.com/ws" >> .env.production
+            npm run build
+
+            # 3. Reload Nginx
+            echo "--- Reloading Nginx ---"
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+            echo "✅ All Systems Deployed!"
